@@ -1,7 +1,7 @@
 import api from '../services/apiService';
 import { formatDate } from '../helpers/date';
 
-class Locations {
+export class Locations {
     constructor(api, helpers) {
         this.api = api;
         this.countries = null;
@@ -71,16 +71,22 @@ class Locations {
         // Список авиакомпаний.
         // { Код компании: экземляр }
         return airlines.reduce((acc, item) => {
-             item.logo = `http://pics.avs.io/200/200/${item.code}.png`;
+            // Делаем копию для тестов, потому что мы перезаписываем исходный объект.
+            // Объект в ходе функции меняется и имеет другие поля
+            // Поэтому тесты не проходит
+            const itemCopy = { ...item }
+            itemCopy.logo = `http://pics.avs.io/200/200/${itemCopy.code}.png`;
         //    Добавляем в каждый элемент ключ logo
-            item.name = item.name || item.name_translations.en;
-            acc[item.code] = item;
+            itemCopy.name = itemCopy.name || itemCopy.name_translations.en;
+            acc[itemCopy.code] = itemCopy;
             return acc;
         }, {})
     }
 
     serializeCountries(countries) {
     //    {     Country_code: {...}     }
+        if (!Array.isArray(countries) || !countries.length) return {};
+        // Если длина = 0 или не массив
         return countries.reduce((acc, country) => {
             acc[country.code] = country;
             // Код страны: объект страны
